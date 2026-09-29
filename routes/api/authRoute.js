@@ -1,0 +1,10 @@
+const express = require("express");
+const router = express.Router(); 
+const authController = require("../../controllers/authController")
+const upload = require("../../middleware/fileUpload")
+router.post("/login",(req,res)=>{
+  
+})
+router.post("/registration",upload.single('picture'),authController.registrationController)
+
+module.exports = router;
