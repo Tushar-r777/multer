@@ -1,13 +1,14 @@
 const express = require("express");
 const router = express.Router();
 
-const test = require("./test.js")
-const authRoute = require("./authRoute.js")
-const productRoute = require("./productRoute.js")
 
-router.use("/test", test);
+const authRoute =  require("./authRoute.js")
+const dashboardRoute = require("./dashboardRoute.js")
+
+
 router.use("/auth", authRoute)
-router.use("/product", productRoute)
+router.use("/dashboard", dashboardRoute)
+
 
 
 module.exports = router;   
