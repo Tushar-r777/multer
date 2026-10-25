@@ -23,4 +23,8 @@ const protect = (req, res, next) => {
   }
 };
 
+const requiredAdmin = (req, res, next)=>{
+  
+}
+
 module.exports = { protect };
