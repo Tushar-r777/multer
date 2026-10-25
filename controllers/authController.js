@@ -485,7 +485,7 @@ const getMeController = async (req, res) => {
 
 const updateProfile = async (req,res) =>{
  try {
-  const updateUser = userModel.findByIdAndUpdate(
+  let updateUser = userModel.findByIdAndUpdate(
     req.user.id,
     {$set: req.body},
     {
@@ -499,6 +499,18 @@ const updateProfile = async (req,res) =>{
       message: "user not found"
     })
   }
+
+   if(req.file){
+   updateUser = await userModel.findByIdAndUpdate(
+      req.user.id,
+    {profilePicture: req.file.path},
+    {
+      new:true,
+      runValidators: true,
+    }
+    )
+   }
+
   res.status(200).json({
     success: true,
     message: "profile updated successfully",
