@@ -1,7 +1,8 @@
 const { verifyAccessToken } = require("../helpers/tokenHelper");
+const userModel = require ("../models/userSchema");
 
-const protect = (req, res, next) => {
-  const authHeader = req.headers.authorization;
+const protect = async(req, res, next) => {
+  const authHeader =  req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({
@@ -13,7 +14,17 @@ const protect = (req, res, next) => {
   const token = authHeader.split(" ")[1];
   try {
     const decoded = verifyAccessToken(token);
-    req.user = decoded;
+
+    const user = await userModel.findById(decoded.id)
+    
+    if(!user){
+      return res.status(401).json({
+        success: false,
+        message: "User not exist"
+     })
+    }
+
+    req.user = user;
     next();
   } catch (error) {
     return res.status(401).json({
@@ -24,7 +35,44 @@ const protect = (req, res, next) => {
 };
 
 const requiredAdmin = (req, res, next)=>{
-  
+  if(req.user.role !== "admin"){
+    return res.status(403).json({
+      success: false,
+      message: "admin access required"
+    })
+  }
+  next()
 }
 
-module.exports = { protect };
+
+const requiredEmployee = (req, res, next)=>{
+  if(req.user.role !== "employee"){
+    return res.status(403).json({
+      success: false,
+      message: "only employee can access this route"
+    })
+  }
+  next()
+}
+
+const requiredUser = (req, res, next)=>{
+  if(req.user.role !== "user"){
+    return res.status(403).json({
+      success: false,
+      message: "only user can access this route"
+    })
+  }
+  next()
+}
+
+const isEmailVerified = (req,res,next) =>{
+  if(!req.user.isEmailVerified){
+      return res.status(403).json({
+      success: false,
+      message: "please verify your email first"
+    })
+  }
+  next()
+}
+
+module.exports = { protect, requiredAdmin,requiredEmployee,requiredUser, isEmailVerified };

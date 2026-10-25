@@ -483,6 +483,36 @@ const getMeController = async (req, res) => {
   }
 };
 
+const updateProfile = async (req,res) =>{
+ try {
+  const updateUser = userModel.findByIdAndUpdate(
+    req.user.id,
+    {$set: req.body},
+    {
+      new:true,
+      runValidators: true,
+    }
+  )
+  if(!updateUser){
+    return res.status(404).json({
+      success: false,
+      message: "user not found"
+    })
+  }
+  res.status(200).json({
+    success: true,
+    message: "profile updated successfully",
+    data: updateUser
+  })
+
+ } catch (error) {
+   res.status(400).json({
+    success:false,
+    message:error.message
+   })
+ }
+}
+
 module.exports = {
   registrationController,
   loginController,
@@ -493,4 +523,5 @@ module.exports = {
   forgotPasswordController,
   resetPasswordController,
   getMeController,
+  updateProfile,
 };
