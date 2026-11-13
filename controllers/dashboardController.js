@@ -39,7 +39,86 @@ const getAllUserController = async (req, res) => {
   }
 };
 
+const getSingleUserController = async (req, res) => {
+   const UserId = req.params.id
+    try {
+    const users = await userModel.findOne({
+      _id: UserId
+    })
+    res.status(200).json({
+        success: true,
+        message: "Users get successfully",
+        data: user,
+    })
+  } catch (error) {
+      res.status(409).json({
+        success: false,
+        message: error.message,
+        UserId: UserId
+      })
+    
+  }
+}
+
+
+const approvedUserController = async (req,res) => {
+   try {
+    let updateUser = userModel.findByIdAndUpdate(
+    req.params.id,
+    {status: true},
+    {
+      new:true,
+      runValidators: true,
+    }
+  )
+  res.status(200).json({
+    success: true,
+    message: "user approved",
+    data: updateUser
+  })
+
+   } catch (error) {
+    res.status(409).json({
+      success: false,
+      message: error.message,
+    })
+   }
+}
+
+
+const deactiveUserController = async (req,res) => {
+   try {
+    const updateUser = userModel.findByIdAndUpdate(req.params.id,);
+  res.status(200).json({
+    success: false,
+    message: "user deactivated",
+  })
+
+   } catch (error) {
+    res.status(409).json({
+      success: false,
+      message: error.message,
+    })
+   }
+}
+
+
+const UserDeleteController = async (req,res) => {
+   try {
+    const deleteUser = userModel.findByIdAndDelete(req.params.id,);
+  res.status(200).json({
+    success: true,
+    message: "user deleted",
+  })
+
+   } catch (error) {
+    res.status(409).json({
+      success: false,
+      message: error.message,
+    })
+   }
+}
 
 module.exports = {
-    getAllUserController
+    getAllUserController, getSingleUserController, approvedUserController,UserDeleteController,deactiveUserController
 }

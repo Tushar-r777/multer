@@ -147,7 +147,13 @@ const loginController = async (req, res) => {
     if (!user.isEmailVerified) {
       return res.status(403).json({
         success: false,
-        message: "Please verify your email before logging in",
+        message: "Please verify your email",
+      });
+    }
+        if (!user.status) {
+      return res.status(403).json({
+        success: false,
+        message: "Request admin to be approved",
       });
     }
 
