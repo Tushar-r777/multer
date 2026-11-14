@@ -25,39 +25,46 @@ const getAllUserController = async (req, res) => {
 
     const search = req.query.search ? req.query.search.trim() : ""
 
-    const page = 1
-    const limit = 5
+    const page = parseInt(req.query.page) || 1
+    const limit = parseInt(req.query.limit) || 5
+
+    const skip = (page - 1) * limit
 
     const filter = {
        _id: {$ne: loggedinUserId}
     }
 
-     if ( search ){
-         const searchRegex = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-         filter.$or = [
-          {username: {$regex: searchRegex, $options: "i"}},
-          {email: {$regex: searchRegex, $options: "i"}}
-         ]
-     }
+    if (search) {
+      const searchRegex = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+      filter.$or = [
+        {username: {$regex: searchRegex, $options: "i"}},
+        {email: {$regex: searchRegex, $options: "i"}}
+      ]
+    }
 
     const users = await userModel.find(
-       filter
+      filter
     )
+    .skip(skip)
+    .limit(limit)
 
-     
+    const totalUsers = await userModel.countDocuments(filter)
 
     res.status(200).json({
-        success: true,
-        message: "Users get successfully",
-        data: {
-          users: users.map(formatUser),
-          length: users.length
-        },
-        loggedinuser: loggedinUser
+      success: true,
+      message: "Users get successfully",
+      data: {
+        users: users.map(formatUser),
+        length: users.length,
+        totalUsers,
+        currentPage: page,
+        totalPages: Math.ceil(totalUsers / limit),
+        limit
+      },
+      loggedinuser: loggedinUser
     })
   } catch (error) {
-      res.send("catch error")
-    
+    res.send("catch error")
   }
 };
 
